@@ -60,7 +60,7 @@ services:
 ```
 
 ### How to Use
-1. Place jar files in the `/usr/share/nginx/html/files</code> directory`
+1. Place jar files in the `/usr/share/nginx/html/files directory`
 2. Call jar files in your config using `yourdomain.com/files/your-jar-file-name.jar`
 
 
