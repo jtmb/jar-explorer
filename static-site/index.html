@@ -64,7 +64,7 @@
         }
 
         .file-list h2 {
-            margin: 0 0 10px;
+            margin: 0;
         }
 
         .file-list pre {
@@ -125,6 +125,20 @@
             display: inline-block;
             margin-right: 10px;
         }
+
+        .copy-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .copy-button:hover {
+            background: #0056b3;
+        }
     </style>
 </head>
 
@@ -145,13 +159,16 @@
             <p></p>
             Call them in your config using <code>yourdomain.com/files/your-jar-file-name.jar</code>
             <p></p>
-            JAR links available to copy under: <code><b style="font-size: 20px;">Available JARS</b></code>
+            <b style="font-size: 20px;">Available JARS</b>
         </div>
     </div>
 
     <!-- JAR Files List -->
     <div class="file-list">
-        <h2>Available JARs</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Available JARs</h2>
+            <button class="copy-button" onclick="copyJarLinks()">Copy</button>
+        </div>
         <pre id="jar-files">Loading...</pre>
     </div>
 
@@ -191,6 +208,21 @@
             } catch (error) {
                 fileList.textContent = "Error loading files.";
             }
+        }
+
+        function copyJarLinks() {
+            const jarFilesText = document.getElementById("jar-files").textContent;
+            if (jarFilesText.trim() === "Loading..." || jarFilesText.trim() === "No JAR files found." || jarFilesText.trim() === "Error loading files.") {
+                alert("No JAR files to copy.");
+                return;
+            }
+
+            navigator.clipboard.writeText(jarFilesText).then(() => {
+                alert("JAR links copied to clipboard!");
+            }).catch(err => {
+                console.error("Failed to copy text: ", err);
+                alert("Failed to copy JAR links.");
+            });
         }
 
         fetchJarFiles();
