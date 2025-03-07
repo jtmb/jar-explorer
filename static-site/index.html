@@ -28,7 +28,6 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            /* Adds spacing between boxes */
         }
 
         .info-box {
@@ -50,17 +49,35 @@
             text-decoration: underline;
         }
 
+        .file-list {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            width: 350px;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            cursor: text;
+        }
+
+        .file-list h2 {
+            margin: 0 0 10px;
+        }
+
+        .file-list pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 14px;
+            color: #4da6ff;
+            user-select: all;
+        }
+
         h1 {
             font-size: 48px;
             margin-bottom: 20px;
-        }
-
-        h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #dedcdc;
-            /* Optional: Add color to the header */
         }
 
         .button {
@@ -78,43 +95,24 @@
             background: #0056b3;
         }
 
-        ul {
-            list-style-type: disc;
-            /* Adds bullet points */
-            padding-left: 20px;
-            /* Adds indentation */
-            text-align: left;
-            /* Ensures text is aligned to the left */
-        }
-
-        li {
-            margin-bottom: 5px;
-            /* Adds space between list items */
-        }
-
-        /* Credits Section */
         .credits {
             position: absolute;
             bottom: 10px;
             left: 20px;
             font-size: 12px;
-            /* Reduced font size */
             color: #636464;
-            /* More transparent white */
             font-weight: 300;
             letter-spacing: 1px;
         }
 
         .credits a {
             color: #2d2e2e;
-            /* Same blue color as in the info-box */
             text-decoration: none;
             font-weight: 300;
         }
 
         .credits a:hover {
             color: rgba(255, 255, 255, 0.7);
-            /* Increased opacity on hover */
             text-decoration: underline;
         }
 
@@ -122,7 +120,6 @@
             font-style: italic;
         }
 
-        /* Ensures repo and author are aligned */
         .credits p {
             margin: 0;
             display: inline-block;
@@ -135,9 +132,8 @@
     <div class="info-container">
         <div class="info-box">
             <h2>Tool Overview</h2>
-            <p>The purpose of this tool is to provide a light weight, automated way to store Minecraft JAR plugins in
-                some form of a
-                "CDN" so it may be called by
+            <p>The purpose of this tool is to provide a lightweight, automated way to store Minecraft JAR plugins in a
+                simple CDN for
                 <a href="https://docker-minecraft-server.readthedocs.io/en/latest/mods-and-plugins/#modplugin-url-listing-file"
                     target="_blank">itzg/docker-minecraft-server</a>.
             </p>
@@ -145,22 +141,61 @@
 
         <div class="info-box">
             <h2>How to use</h2>
-            <ul>
-                <li>Place jar files in the <code>/usr/share/nginx/html/files</code> directory.</li>
-                <li>Call jar files in your config using <code>yourdomain.com/files/your-jar-file-name.jar</code></li>
-            </ul>
+            Place jar files in the <code>/usr/share/nginx/html/files</code> directory.
+            <p></p>
+            Call them in your config using <code>yourdomain.com/files/your-jar-file-name.jar</code>
+            <p></p>
+            JAR links available to copy under: <code><b style="font-size: 20px;">Available JARS</b></code>
         </div>
+    </div>
+
+    <!-- JAR Files List -->
+    <div class="file-list">
+        <h2>Available JARs</h2>
+        <pre id="jar-files">Loading...</pre>
     </div>
 
     <h1>JAR Explorer</h1>
     <a href="/files" class="button">Go to Files</a>
 
-    <!-- Credits Section -->
     <div class="credits">
         <p>Repo: <a href="https://github.com/jtmb/jar-explorer" target="_blank">https://github.com/jtmb/jar-explorer</a>
         </p>
         <p>Author: <a href="https://github.com/jtmb" target="_blank">https://github.com/jtmb</a></p>
     </div>
+
+    <script>
+        async function fetchJarFiles() {
+            const fileList = document.getElementById("jar-files");
+
+            try {
+                const response = await fetch("/files/");
+                const text = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, "text/html");
+                const links = [...doc.querySelectorAll("a")];
+
+                // Get the dynamic base URL
+                const baseUrl = window.location.origin + "/files/";
+
+                // Filter only .jar files
+                const jarFiles = links
+                    .map(link => link.getAttribute("href"))
+                    .filter(name => name.endsWith(".jar"));
+
+                if (jarFiles.length > 0) {
+                    fileList.textContent = jarFiles.map(file => baseUrl + file).join("\n");
+                } else {
+                    fileList.textContent = "No JAR files found.";
+                }
+            } catch (error) {
+                fileList.textContent = "Error loading files.";
+            }
+        }
+
+        fetchJarFiles();
+    </script>
+
 </body>
 
 </html>
