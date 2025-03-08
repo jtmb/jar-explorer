@@ -217,12 +217,22 @@
                 return;
             }
 
-            navigator.clipboard.writeText(jarFilesText).then(() => {
+            // Create a temporary textarea element
+            const textArea = document.createElement("textarea");
+            textArea.value = jarFilesText;
+            document.body.appendChild(textArea);
+            textArea.select();
+
+            try {
+                document.execCommand("copy");
                 alert("JAR links copied to clipboard!");
-            }).catch(err => {
+            } catch (err) {
                 console.error("Failed to copy text: ", err);
                 alert("Failed to copy JAR links.");
-            });
+            }
+
+            // Remove the textarea element
+            document.body.removeChild(textArea);
         }
 
         fetchJarFiles();
